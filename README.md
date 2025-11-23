@@ -4,8 +4,12 @@ This is a custom card for Home Assistant that shows an entity value as a mechani
 Each character sits on its own “wheel” and spins to the new value, like an old-school counter or split-flap display.
 
 The card is read-only. It does not control the entity in any way.
-![Video from demo](/img/deomflip.mp4)
+
 ---
+
+
+https://github.com/user-attachments/assets/0a1d7521-89bc-42fb-8cc4-a45b2cebc417
+
 
 ## How it works
 
