@@ -12,6 +12,7 @@ class FlipSensorCard extends HTMLElement {
     this.surplusStrikeCount = 0;
     this.cleanupThreshold = 3; 
 
+    // MOTYWY
     this.themes = {
         'classic': { bg: '#333', text: '#f0f0f0', radius: '6px', shadow: '0 2px 5px rgba(0,0,0,0.4)', font: "'Oswald', sans-serif", border: 'none', textShadow: 'none' },
         'ios-light': { bg: '#ffffff', text: '#000000', radius: '6px', shadow: '0 4px 10px rgba(0,0,0,0.15)', font: "-apple-system, sans-serif", border: '1px solid #e0e0e0', textShadow: 'none' },
@@ -28,11 +29,14 @@ class FlipSensorCard extends HTMLElement {
     
     this.normalSpeed = config.speed !== undefined ? config.speed : 0.6;
     this.spinSpeed = config.spin_speed !== undefined ? config.spin_speed : 0.12;
-    
-    // Szybkość usuwania pustych kafelków
     this.removeSpeed = config.remove_speed !== undefined ? config.remove_speed : 0.5;
 
-    // --- POPRAWKA: Aktualizacja zmiennej CSS na żywo ---
+    // --- NOWE OPCJE JEDNOSTEK ---
+    // unit_pos: 'top', 'bottom', 'none' (domyślnie none = wewnątrz bębna)
+    this.unitPos = config.unit_pos || 'none';
+    // unit: Opcjonalne nadpisanie tekstu jednostki
+    this.manualUnit = config.unit || null; 
+
     this.style.setProperty('--remove-duration', `${this.removeSpeed}s`);
 
     this.cardSize = config.size || 50; 
@@ -52,36 +56,75 @@ class FlipSensorCard extends HTMLElement {
     const stateObj = hass.states[entityId];
     if (!stateObj) return;
 
-    let newState = stateObj.state;
-    if (this.config.show_unit && stateObj.attributes.unit_of_measurement) {
-         newState += stateObj.attributes.unit_of_measurement;
+    // 1. Pobieramy wartość
+    let value = stateObj.state;
+    // 2. Pobieramy jednostkę (z configu LUB z sensora)
+    let unit = this.manualUnit !== null ? this.manualUnit : (stateObj.attributes.unit_of_measurement || '');
+
+    // 3. Logika łączenia
+    let displayString = value;
+
+    if (this.unitPos === 'none' && unit) {
+        // Stara metoda: doklejamy jednostkę do bębna
+        displayString += unit;
+    } else {
+        // Nowa metoda: aktualizujemy statyczny label
+        this.updateUnitLabel(unit);
     }
 
     if (!this.content) {
       this.render();
-      this.updateDisplay(newState, true);
-      this.lastState = newState;
-    } else if (newState !== this.lastState) {
-      this.lastState = newState;
-      this.updateDisplay(newState, false);
+      // Musimy wywołać to jeszcze raz po renderze, żeby label się pojawił przy starcie
+      if(this.unitPos !== 'none') this.updateUnitLabel(unit);
+      
+      this.updateDisplay(displayString, true);
+      this.lastState = displayString;
+    } else if (displayString !== this.lastState) {
+      this.lastState = displayString;
+      this.updateDisplay(displayString, false);
     }
+  }
+
+  updateUnitLabel(text) {
+      if (!this.shadowRoot) return;
+      
+      const topLabel = this.shadowRoot.getElementById('unit-top');
+      const bottomLabel = this.shadowRoot.getElementById('unit-bottom');
+
+      if (this.unitPos === 'top' && topLabel) {
+          topLabel.innerText = text;
+          topLabel.style.display = 'block';
+          if(bottomLabel) bottomLabel.style.display = 'none';
+      } else if (this.unitPos === 'bottom' && bottomLabel) {
+          bottomLabel.innerText = text;
+          bottomLabel.style.display = 'block';
+          if(topLabel) topLabel.style.display = 'none';
+      } else {
+          if(topLabel) topLabel.style.display = 'none';
+          if(bottomLabel) bottomLabel.style.display = 'none';
+      }
   }
 
   async startDemoMode() {
       this.isDemoRunning = true;
       if(!this.content) this.render();
       
+      // W trybie demo ustawiamy przykładową jednostkę
+      if (this.unitPos !== 'none') this.updateUnitLabel(this.manualUnit || 'km/h');
+
       const sequence = ['1234', '12345678', '1111', '22', '33', '4444'];
       let idx = 0;
       await this.updateDisplay(sequence[0], true);
 
       while (this.isDemoRunning) {
-          // Czekamy dłużej niż trwa animacja usuwania
-          await new Promise(resolve => setTimeout(resolve, 3000));
+          await new Promise(resolve => setTimeout(resolve, 2500));
           idx = (idx + 1) % sequence.length;
           
           if(idx === 0) {
               this.content.innerHTML = ''; 
+              // Odtwórz strukturę labeli po czyszczeniu (bo innerHTML wyczyścił wszystko w #display, a labele są obok)
+              // Chociaż czekaj, #display to kontener kafelków. Labele są w .card-content.
+              // Więc tutaj czyścimy tylko kafelki.
               this.currentDisplayValue = [];
               this.surplusStrikeCount = 0;
               await this.updateDisplay(sequence[0], true);
@@ -112,17 +155,26 @@ class FlipSensorCard extends HTMLElement {
             --card-width: calc(var(--card-size) * 0.70); 
             --font-size: calc(var(--card-size) * 0.85); 
             --flip-duration: 0.5s;
-            
-            /* Zmienna CSS jest teraz ustawiana przez JS w setConfig */
-            /* Jeśli nie jest ustawiona, domyślnie 0.5s */
             --remove-duration-internal: var(--remove-duration, 0.5s);
-            
             ${themeCSS} 
             ${customOverride} 
         }
         .card-content { display: flex; flex-direction: column; align-items: center; padding: 16px; background: var(--ha-card-background, transparent); }
         .flip-clock { display: flex; justify-content: center; gap: ${this.gap}px; perspective: 1000px; }
         
+        /* STYLE JEDNOSTKI (HEADER/FOOTER) */
+        .unit-label {
+            font-family: var(--flip-font);
+            color: var(--flip-text);
+            opacity: 0.7;
+            font-size: calc(var(--font-size) * 0.4); /* Mniejsza czcionka dla jednostki */
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: var(--flip-text-shadow);
+            margin: 4px 0;
+            display: none; /* Domyślnie ukryte, JS włącza odpowiedni */
+        }
+
         .flip-unit { 
             position: relative; 
             flex: 0 0 var(--card-width); 
@@ -138,8 +190,6 @@ class FlipSensorCard extends HTMLElement {
             box-shadow: var(--flip-shadow); 
             text-align: center; 
             border: var(--flip-border); 
-            
-            /* Animacje z wykorzystaniem poprawnej zmiennej */
             transition: 
                 width var(--remove-duration-internal) ease-in-out, 
                 flex-basis var(--remove-duration-internal) ease-in-out,
@@ -147,19 +197,13 @@ class FlipSensorCard extends HTMLElement {
                 margin var(--remove-duration-internal) ease-in-out, 
                 opacity var(--remove-duration-internal) ease-in-out, 
                 transform var(--remove-duration-internal) ease-in-out;
-            
             overflow: hidden; 
         }
         
         .flip-unit.removing { 
-            width: 0 !important; 
-            flex-basis: 0 !important;
-            min-width: 0 !important;
-            margin: 0 !important; 
-            opacity: 0 !important; 
-            transform: scale(0.5);
-            border: none !important;
-            box-shadow: none !important;
+            width: 0 !important; flex-basis: 0 !important; min-width: 0 !important;
+            margin: 0 !important; opacity: 0 !important; transform: scale(0.5);
+            border: none !important; box-shadow: none !important;
         }
 
         .top, .bottom, .flap { position: absolute; left: 0; width: 100%; height: 50%; overflow: hidden; background: var(--flip-bg); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
@@ -174,9 +218,15 @@ class FlipSensorCard extends HTMLElement {
         @keyframes flipDownFront { 0% { transform: rotateX(0deg); } 100% { transform: rotateX(-180deg); } }
         @keyframes flipDownBack { 0% { transform: rotateX(180deg); } 100% { transform: rotateX(0deg); } }
       </style>
+
       <div class="card-content">
-        ${this.config.title ? `<div style="margin-bottom:12px; font-weight:500; opacity:0.9;">${this.config.title}</div>` : ''}
+        ${this.config.title ? `<div style="margin-bottom:8px; font-weight:500; opacity:0.9;">${this.config.title}</div>` : ''}
+        
+        <div id="unit-top" class="unit-label"></div>
+        
         <div id="display" class="flip-clock"></div>
+        
+        <div id="unit-bottom" class="unit-label"></div>
       </div>
     `;
     this.content = this.shadowRoot.getElementById('display');
@@ -230,16 +280,11 @@ class FlipSensorCard extends HTMLElement {
             for (let i = 0; i < excessCount; i++) {
                 if (displayEl.children[i]) unitsToRemove.push(displayEl.children[i]);
             }
-
             unitsToRemove.forEach(el => el.classList.add('removing'));
-
-            // WAŻNE: JS czeka na zmienną this.removeSpeed, która jest też w CSS
             await new Promise(r => setTimeout(r, this.removeSpeed * 1000));
-
             unitsToRemove.forEach(el => {
                 if(el.parentNode === displayEl) displayEl.removeChild(el);
             });
-            
             this.currentDisplayValue.splice(0, excessCount);
             paddedInput = paddedInput.substring(excessCount);
             this.surplusStrikeCount = 0;
