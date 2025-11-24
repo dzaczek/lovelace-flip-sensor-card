@@ -109,7 +109,12 @@ You can override specific visual elements using the `custom_style` option in YAM
 | `--flip-border` | CSS border definition | `1px solid red` |
 | `--flip-text-shadow` | CSS text-shadow (useful for neon effects) | `0 0 5px green` |
 
+
 #### Example Usage
+
+
+https://github.com/user-attachments/assets/0f3b64ae-e013-4201-a333-4959848b4bc3
+
 
 ```yaml
 type: custom:flip-sensor-card
@@ -121,6 +126,7 @@ custom_style:
   --flip-bg: "#000000"
   --flip-text: "#00ff00"
   --flip-border-radius: "0px"
+```
 ---
 
 ### `entity` (string)
