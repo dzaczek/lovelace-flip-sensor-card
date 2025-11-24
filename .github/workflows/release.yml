@@ -1,0 +1,29 @@
+name: Create New Release
+
+# To pozwala uruchomić akcję ręcznie z zakładki "Actions"
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version np. v23.0.1'
+        required: true
+        default: 'v23.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          name: Release ${{ github.event.inputs.version }}
+          generate_release_notes: true # Automatycznie wygeneruje listę zmian z commitów
+          draft: false
+          prerelease: false
