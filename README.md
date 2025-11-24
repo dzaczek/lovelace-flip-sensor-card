@@ -71,6 +71,56 @@ The card will show the entity state as a row of drums, using the default theme.
 
 Below is a list of all options you can use in the card config.
 
+
+# ⚙️ Configuration Options
+
+Here is a complete list of all available options for the `flip-sensor-card`.
+
+| Name | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| **`entity`** | `string` | **Required** | The entity ID to display (e.g., `sensor.temperature`). Required unless `demo_mode` is true. |
+| **`attribute`** | `string` | `null` | (Optional) Specific attribute to display instead of the main state (e.g., `current_temperature`, `hour`). |
+| `title` | `string` | `null` | A title displayed at the top of the card. |
+| `theme` | `string` | `classic` | Visual preset. Options: `classic`, `ios-light`, `ios-dark`, `neon`, `wood`, `red`. |
+| `size` | `number` | `50` | Height of the flip tiles in pixels. |
+| `digit_count` | `number` | `4` | Target number of digits. The card adds empty padding tiles if the number is shorter. |
+| `gap` | `number` | `5` | Spacing (gap) between individual tiles in pixels. |
+| `unit_pos` | `string` | `none` | [Work In Progress] Position of the unit label. Options: `top`, `bottom`, `none` (inside the drum). |
+| `unit` | `string` | `null` | [Work In Progress] Manually override the unit text. If not set, it pulls `unit_of_measurement` from the entity. |
+| `speed` | `number` | `0.6` | Duration (in seconds) for a single step flip (e.g., 1 -> 2). |
+| `spin_speed` | `number` | `0.12` | Duration (in seconds) for fast spinning steps (e.g., 5 -> 4 loop). |
+| `remove_speed`| `number`| `0.5` | Duration (in seconds) of the fade-out/collapse animation when removing empty tiles. |
+| `demo_mode` | `boolean`| `false` | If `true`, ignores the entity and runs a test animation loop. |
+| `custom_style`| `object` | `null` | A map of CSS variables to override styles (see below). |
+
+---
+
+### 🎨 CSS Variables (custom_style)
+
+You can override specific visual elements using the `custom_style` option in YAML.
+
+| Variable Name | Description | Example |
+| :--- | :--- | :--- |
+| `--flip-bg` | Background color of the tiles | `#222`, `rgba(0,0,0,0.8)` |
+| `--flip-text` | Color of the numbers | `#ff0000`, `white` |
+| `--flip-font` | Font family used for digits | `'Courier New'`, `sans-serif` |
+| `--flip-border-radius`| Rounding of the tile corners | `4px`, `50%` |
+| `--flip-shadow` | CSS box-shadow for the tiles | `0 4px 10px rgba(0,0,0,0.5)` |
+| `--flip-border` | CSS border definition | `1px solid red` |
+| `--flip-text-shadow` | CSS text-shadow (useful for neon effects) | `0 0 5px green` |
+
+#### Example Usage
+
+```yaml
+type: custom:flip-sensor-card
+entity: sensor.power_usage
+digit_count: 5
+unit_pos: bottom
+theme: classic
+custom_style:
+  --flip-bg: "#000000"
+  --flip-text: "#00ff00"
+  --flip-border-radius: "0px"
 ---
 
 ### `entity` (string)
