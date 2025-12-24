@@ -1,0 +1,45 @@
+Release v25.0.1: Major improvements and new features
+
+This release includes significant bug fixes, performance optimizations, code quality improvements, and a new theme.
+
+## Major Changes
+
+### New Features
+- Added `aviation-departure` theme - Classic airport board style with yellow text on black
+- Implemented `attribute` option to display entity attributes instead of state
+- Added comprehensive error handling with user-friendly messages
+- Added JSDoc documentation for all major methods
+- Implemented input validation for all configuration parameters
+- Added XSS protection through HTML escaping
+
+### Bug Fixes
+- Fixed `getCardSize()` to return actual card size instead of hardcoded value
+- Fixed error messages (changed from Polish to English)
+- Improved entity state handling for unavailable/unknown states
+- Fixed surplus tiles cleanup logic
+- Optimized font loading to prevent duplicate imports
+
+### Code Quality
+- Unified all comments to English
+- Extracted magic numbers to named constants
+- Added DOM element caching for performance
+- Added proper lifecycle cleanup with `disconnectedCallback`
+- Improved demo mode with better async handling
+
+### Documentation
+- Synchronized README with actual code implementation
+- Removed outdated `show_unit` documentation
+- Added detailed `attribute` option documentation
+- Updated all examples to use correct options
+
+### Performance
+- Optimized Google Fonts loading
+- Reduced redundant DOM queries
+- Improved animation promise handling
+
+### Security
+- Added HTML escaping for XSS prevention
+- Added input sanitization
+
+See CHANGELOG.md for detailed list of changes.
+

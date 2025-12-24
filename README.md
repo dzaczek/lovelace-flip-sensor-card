@@ -13,11 +13,12 @@ https://github.com/user-attachments/assets/0a1d7521-89bc-42fb-8cc4-a45b2cebc417
 
 ## How it works
 
-- It reads the state of the given entity (for example `sensor.temperature_living_room`).
-- It splits the state string into individual characters.
+- It reads the state of the given entity (for example `sensor.temperature_living_room`), or a specific attribute if `attribute` is specified.
+- It splits the value string into individual characters.
 - Each character is rendered as a separate drum.
 - When the value changes, each drum spins through its character set until it reaches the new one.
 - Some characters use the flip animation, others are updated instantly.
+- If the entity is unavailable or not found, an error message is displayed.
 
 Characters that support animated spinning:
 
@@ -81,12 +82,12 @@ Here is a complete list of all available options for the `flip-sensor-card`.
 | **`entity`** | `string` | **Required** | The entity ID to display (e.g., `sensor.temperature`). Required unless `demo_mode` is true. |
 | **`attribute`** | `string` | `null` | (Optional) Specific attribute to display instead of the main state (e.g., `current_temperature`, `hour`). |
 | `title` | `string` | `null` | A title displayed at the top of the card. |
-| `theme` | `string` | `classic` | Visual preset. Options: `classic`, `ios-light`, `ios-dark`, `neon`, `wood`, `red`. |
+| `theme` | `string` | `classic` | Visual preset. Options: `classic`, `ios-light`, `ios-dark`, `neon`, `wood`, `red`, `aviation-departure`. |
 | `size` | `number` | `50` | Height of the flip tiles in pixels. |
 | `digit_count` | `number` | `4` | Target number of digits. The card adds empty padding tiles if the number is shorter. |
 | `gap` | `number` | `5` | Spacing (gap) between individual tiles in pixels. |
-| `unit_pos` | `string` | `none` | [Work In Progress] Position of the unit label. Options: `top`, `bottom`, `none` (inside the drum). |
-| `unit` | `string` | `null` | [Work In Progress] Manually override the unit text. If not set, it pulls `unit_of_measurement` from the entity. |
+| `unit_pos` | `string` | `none` | Position of the unit label. Options: `top`, `bottom`, `none` (inside the drum). |
+| `unit` | `string` | `null` | Manually override the unit text. If not set, it pulls `unit_of_measurement` from the entity. |
 | `speed` | `number` | `0.6` | Duration (in seconds) for a single step flip (e.g., 1 -> 2). |
 | `spin_speed` | `number` | `0.12` | Duration (in seconds) for fast spinning steps (e.g., 5 -> 4 loop). |
 | `remove_speed`| `number`| `0.5` | Duration (in seconds) of the fade-out/collapse animation when removing empty tiles. |
@@ -191,13 +192,41 @@ digit_count: 6
 
 ---
 
-### `show_unit` (bool)
+### `attribute` (string)
 
-- If `true` and the entity has `unit_of_measurement` (like `°C`, `%`, `kWh`), the unit is appended to the value.
-- The unit is treated as a normal character in the display.
+- Optional attribute name to display instead of the main entity state.
+- Useful for displaying specific attributes like `current_temperature`, `hour`, `minute`, etc.
+- If the attribute doesn't exist, an error message will be displayed.
 
 ```yaml
-show_unit: true
+entity: sensor.weather
+attribute: current_temperature
+```
+
+---
+
+### `unit_pos` (string)
+
+- Position where the unit label is displayed.
+- Options:
+  - `none` (default): Unit is appended to the value as part of the flip display
+  - `top`: Unit is displayed above the flip display
+  - `bottom`: Unit is displayed below the flip display
+
+```yaml
+unit_pos: top
+```
+
+---
+
+### `unit` (string)
+
+- Manually override the unit text.
+- If not set, the card automatically uses `unit_of_measurement` from the entity attributes.
+- Useful when you want to display a different unit than what the entity provides.
+
+```yaml
+unit: "°F"
 ```
 
 ---
@@ -282,6 +311,9 @@ Available themes:
 - `red`  
   Dark background with red digits. Feels like an alarm / HUD display.
 
+- `aviation-departure`  
+  Classic airport departure board style with yellow text on black background. Uses Oswald font for authentic look.
+
 Example:
 
 ```yaml
@@ -332,7 +364,7 @@ custom_style:
 type: custom:flip-sensor-card
 entity: sensor.temperature_living_room
 title: Living room
-show_unit: true
+unit_pos: none
 theme: classic
 ```
 
@@ -344,7 +376,7 @@ theme: classic
 type: custom:flip-sensor-card
 entity: sensor.power_usage
 title: Power usage
-show_unit: true
+unit_pos: bottom
 theme: neon
 size: 70
 speed: 0.5
@@ -360,7 +392,7 @@ remove_speed: 0.4
 type: custom:flip-sensor-card
 entity: sensor.energy_today
 title: Energy today
-show_unit: true
+unit_pos: top
 theme: ios-dark
 size: 80
 digit_count: 6
@@ -368,7 +400,20 @@ digit_count: 6
 
 ---
 
-### 4. Demo mode (no entity required)
+### 4. Using attribute option
+
+```yaml
+type: custom:flip-sensor-card
+entity: sensor.weather
+attribute: current_temperature
+title: Current Temperature
+unit_pos: bottom
+theme: classic
+```
+
+---
+
+### 5. Demo mode (no entity required)
 
 ```yaml
 type: custom:flip-sensor-card
