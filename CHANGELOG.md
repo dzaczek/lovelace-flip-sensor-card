@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [25.0.1] - 2025-01-XX
+## [25.0.1] - 2025-12-24
 
 ### Added
 - **New theme: `aviation-departure`** - Classic airport departure board style with yellow text on black background, using Oswald font for authentic look

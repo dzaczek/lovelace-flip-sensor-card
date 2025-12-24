@@ -1,29 +1,95 @@
-name: Create New Release
+name: Create Release
 
-# To pozwala uruchomić akcję ręcznie z zakładki "Actions"
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version np. v23.0.1'
-        required: true
-        default: 'v23.0.0'
-
-permissions:
-  contents: write
+  push:
+    tags:
+      - 'v*.*.*'  # Triggers on tags like v25.0.1, v1.2.3, etc.
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+        with:
+          fetch-depth: 0  # Fetch all history for changelog
+        
+      - name: Get tag version
+        id: tag_version
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "version=${TAG_NAME#v}" >> $GITHUB_OUTPUT
+          echo "Tag: $TAG_NAME"
+          echo "Version: ${TAG_NAME#v}"
+      
+      - name: Extract changelog
+        id: changelog
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG_NAME#v}
+          
+          # Extract changelog entry for this version
+          if [ -f CHANGELOG.md ]; then
+            # Extract section for this version
+            awk "/^## \[$VERSION\]/,/^## \[/" CHANGELOG.md | sed '$d' > release_notes.txt
+            if [ -s release_notes.txt ]; then
+              echo "changelog<<EOF" >> $GITHUB_OUTPUT
+              cat release_notes.txt >> $GITHUB_OUTPUT
+              echo "EOF" >> $GITHUB_OUTPUT
+            else
+              # Fallback if version not found in changelog
+              echo "changelog=Release $TAG_NAME" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "changelog=Release $TAG_NAME" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Validate files
+        run: |
+          echo "Validating required files..."
+          if [ ! -f flip-sensor-card.js ]; then
+            echo "Error: flip-sensor-card.js not found!"
+            exit 1
+          fi
+          if [ ! -f hacs.json ]; then
+            echo "Error: hacs.json not found!"
+            exit 1
+          fi
+          echo "✓ All required files present"
+      
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.event.inputs.version }}
-          name: Release ${{ github.event.inputs.version }}
-          generate_release_notes: true # Automatycznie wygeneruje listę zmian z commitów
+          name: Release ${{ steps.tag_version.outputs.tag_name }}
+          body: |
+            ## Release ${{ steps.tag_version.outputs.tag_name }}
+            
+            ${{ steps.changelog.outputs.changelog }}
+            
+            ### Files
+            - `flip-sensor-card.js` - Main card file
+            - `hacs.json` - HACS configuration
+            - `README.md` - Documentation
+            - `CHANGELOG.md` - Full changelog
+            
+            ### Installation
+            1. Download `flip-sensor-card.js` from the assets below
+            2. Place it in `/config/www/`
+            3. Add resource in Lovelace:
+               ```yaml
+               url: /local/flip-sensor-card.js
+               type: module
+               ```
+          files: |
+            flip-sensor-card.js
+            hacs.json
+            README.md
+            CHANGELOG.md
           draft: false
           prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

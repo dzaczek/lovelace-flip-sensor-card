@@ -1,0 +1,60 @@
+name: Validate Code
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Validate JavaScript syntax
+        run: |
+          echo "Validating JavaScript syntax..."
+          if command -v node &> /dev/null; then
+            node -c flip-sensor-card.js && echo "✓ JavaScript syntax valid"
+          else
+            echo "⚠ Node.js not available, skipping syntax check"
+          fi
+      
+      - name: Check required files
+        run: |
+          echo "Checking required files..."
+          required_files=("flip-sensor-card.js" "hacs.json" "README.md" "LICENSE")
+          for file in "${required_files[@]}"; do
+            if [ -f "$file" ]; then
+              echo "✓ $file exists"
+            else
+              echo "✗ $file missing!"
+              exit 1
+            fi
+          done
+      
+      - name: Validate hacs.json
+        run: |
+          echo "Validating hacs.json..."
+          if command -v python3 &> /dev/null; then
+            python3 -m json.tool hacs.json > /dev/null && echo "✓ hacs.json is valid JSON"
+          else
+            echo "⚠ Python not available, skipping JSON validation"
+          fi
+      
+      - name: Check file sizes
+        run: |
+          echo "Checking file sizes..."
+          if [ -f flip-sensor-card.js ]; then
+            size=$(wc -c < flip-sensor-card.js)
+            echo "flip-sensor-card.js size: $size bytes"
+            if [ $size -lt 100 ]; then
+              echo "⚠ Warning: flip-sensor-card.js seems too small"
+            fi
+          fi
+

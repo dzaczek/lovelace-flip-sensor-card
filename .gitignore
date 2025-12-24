@@ -1,0 +1,21 @@
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+release_notes.txt
+
+# Node modules (if you add build tools later)
+node_modules/
+package-lock.json
+yarn.lock
+
