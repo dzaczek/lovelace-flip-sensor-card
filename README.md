@@ -32,7 +32,7 @@ https://github.com/user-attachments/assets/0a1d7521-89bc-42fb-8cc4-a45b2cebc417
 
 1. Go to **HACS → Frontend**.
 2. Click menu (three dots) → **Custom repositories**.
-3. Add this repo URL with category **Lovelace**.
+3. Add this repo URL with category **Dasboard**.
 4. Click **Install**.
 5. Reload your dashboard.
 
