@@ -64,3 +64,4 @@ Tags must follow semantic versioning format:
 - Validate JavaScript syntax manually
 - Ensure `hacs.json` is valid JSON
 
+

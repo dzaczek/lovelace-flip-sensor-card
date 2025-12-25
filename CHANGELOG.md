@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [25.0.2] - 2025-12-24
+
+### Added
+- **Lovelace Visual Editor Support** - Added a visual editor interface for configuring the card directly in Lovelace UI. Now all parameters (entity, theme, size, speeds, etc.) can be adjusted via graphical form instead of YAML.
+- **Card Preview** - Added card preview support for the "Add Card" dialog in Lovelace.
+
 ## [25.0.1] - 2025-12-24
 
 ### Added
@@ -55,4 +61,3 @@ All notable changes to this project will be documented in this file.
 ## Previous Versions
 
 For earlier versions, see the git commit history.
-

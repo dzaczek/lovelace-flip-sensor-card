@@ -616,6 +616,188 @@ class FlipSensorCard extends HTMLElement {
   getCardSize() {
     return this.cardSize || 50;
   }
+
+  static getStubConfig() {
+    return {
+      entity: '',
+      title: 'Flip Sensor',
+      theme: 'classic',
+      size: 50,
+      digit_count: 4,
+      unit_pos: 'none'
+    }
+  }
+
+  static getConfigElement() {
+    return document.createElement('flip-sensor-card-editor');
+  }
 }
 
+class FlipSensorCardEditor extends HTMLElement {
+  setConfig(config) {
+    this._config = config;
+    this.render();
+  }
+
+  configChanged(newConfig) {
+    const event = new Event('config-changed', {
+      bubbles: true,
+      composed: true,
+    });
+    event.detail = { config: newConfig };
+    this.dispatchEvent(event);
+  }
+
+  render() {
+    if (!this.shadowRoot) {
+      this.attachShadow({ mode: 'open' });
+    }
+
+    const config = this._config || {};
+    
+    this.shadowRoot.innerHTML = `
+      <style>
+        .card-config {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          padding: 16px;
+        }
+        .row {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+        label {
+          font-weight: 500;
+        }
+        input, select {
+          padding: 8px;
+          border: 1px solid var(--primary-text-color, #ccc);
+          border-radius: 4px;
+          background: var(--card-background-color, #fff);
+          color: var(--primary-text-color, #000);
+        }
+        .checkbox-row {
+          flex-direction: row;
+          align-items: center;
+          gap: 8px;
+        }
+      </style>
+      <div class="card-config">
+        <div class="row">
+          <label>Entity (Required)</label>
+          <input type="text" id="entity" value="${config.entity || ''}">
+        </div>
+        
+        <div class="row">
+          <label>Attribute (Optional)</label>
+          <input type="text" id="attribute" value="${config.attribute || ''}">
+        </div>
+
+        <div class="row">
+          <label>Title</label>
+          <input type="text" id="title" value="${config.title || ''}">
+        </div>
+
+        <div class="row">
+          <label>Theme</label>
+          <select id="theme">
+            <option value="classic" ${config.theme === 'classic' ? 'selected' : ''}>Classic</option>
+            <option value="ios-light" ${config.theme === 'ios-light' ? 'selected' : ''}>iOS Light</option>
+            <option value="ios-dark" ${config.theme === 'ios-dark' ? 'selected' : ''}>iOS Dark</option>
+            <option value="neon" ${config.theme === 'neon' ? 'selected' : ''}>Neon</option>
+            <option value="wood" ${config.theme === 'wood' ? 'selected' : ''}>Wood</option>
+            <option value="red" ${config.theme === 'red' ? 'selected' : ''}>Red</option>
+            <option value="aviation-departure" ${config.theme === 'aviation-departure' ? 'selected' : ''}>Aviation Departure</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label>Size (px)</label>
+          <input type="number" id="size" value="${config.size || 50}">
+        </div>
+
+        <div class="row">
+          <label>Digit Count</label>
+          <input type="number" id="digit_count" value="${config.digit_count || 4}">
+        </div>
+
+        <div class="row">
+          <label>Gap (px)</label>
+          <input type="number" id="gap" value="${config.gap || 5}">
+        </div>
+
+        <div class="row">
+          <label>Unit Position</label>
+          <select id="unit_pos">
+            <option value="none" ${config.unit_pos === 'none' ? 'selected' : ''}>None (Inside)</option>
+            <option value="top" ${config.unit_pos === 'top' ? 'selected' : ''}>Top</option>
+            <option value="bottom" ${config.unit_pos === 'bottom' ? 'selected' : ''}>Bottom</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label>Manual Unit (Optional)</label>
+          <input type="text" id="unit" value="${config.unit || ''}">
+        </div>
+
+        <div class="row">
+          <label>Animation Speed (s)</label>
+          <input type="number" step="0.1" id="speed" value="${config.speed || 0.6}">
+        </div>
+
+        <div class="row">
+          <label>Spin Speed (s)</label>
+          <input type="number" step="0.01" id="spin_speed" value="${config.spin_speed || 0.12}">
+        </div>
+        
+        <div class="row checkbox-row">
+          <input type="checkbox" id="demo_mode" ${config.demo_mode ? 'checked' : ''}>
+          <label for="demo_mode">Demo Mode</label>
+        </div>
+      </div>
+    `;
+
+    this.shadowRoot.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('change', this._valueChanged.bind(this));
+    });
+  }
+
+  _valueChanged(ev) {
+    if (!this._config || !this.shadowRoot) return;
+    const target = ev.target;
+    const configValue = target.type === 'checkbox' ? target.checked : target.value;
+    const configKey = target.id;
+    
+    // Numeric conversion
+    let finalValue = configValue;
+    if (['size', 'digit_count', 'gap', 'speed', 'spin_speed', 'remove_speed'].includes(configKey)) {
+        finalValue = Number(configValue);
+    }
+
+    if (this._config[configKey] === finalValue) return;
+
+    const newConfig = {
+      ...this._config,
+      [configKey]: finalValue,
+    };
+    
+    // Remove empty optional strings
+    if (typeof finalValue === 'string' && finalValue.trim() === '') {
+        delete newConfig[configKey];
+    }
+
+    this.configChanged(newConfig);
+  }
+}
+
+customElements.define('flip-sensor-card-editor', FlipSensorCardEditor);
 customElements.define('flip-sensor-card', FlipSensorCard);
+window.customCards = window.customCards || [];
+window.customCards.push({
+  type: "flip-sensor-card",
+  name: "Flip Sensor Card",
+  preview: true,
+  description: "A mechanical flip display for sensor values"
+});
