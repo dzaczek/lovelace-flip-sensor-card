@@ -1,0 +1,137 @@
+title: Flip Sensor Card Demo
+views:
+  - title: Themes Showcase
+    path: themes
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: "## Built-in Themes"
+            
+          - type: custom:flip-sensor-card
+            demo_mode: true
+            theme: classic
+            title: "Theme: Classic (Default)"
+            unit_pos: right
+            unit: "°C"
+            
+          - type: custom:flip-sensor-card
+            demo_mode: true
+            theme: ios-light
+            title: "Theme: iOS Light"
+            unit_pos: right
+            unit: "%"
+
+          - type: custom:flip-sensor-card
+            demo_mode: true
+            theme: ios-dark
+            title: "Theme: iOS Dark"
+            unit_pos: right
+            unit: "kWh"
+
+          - type: custom:flip-sensor-card
+            demo_mode: true
+            theme: neon
+            title: "Theme: Neon"
+            unit_pos: right
+            unit: "W"
+
+          - type: custom:flip-sensor-card
+            demo_mode: true
+            theme: wood
+            title: "Theme: Wood"
+            unit_pos: right
+            unit: "kg"
+
+          - type: custom:flip-sensor-card
+            demo_mode: true
+            theme: red
+            title: "Theme: Red"
+            unit_pos: right
+            unit: "RPM"
+            
+          - type: custom:flip-sensor-card
+            demo_mode: true
+            theme: aviation-departure
+            title: "Theme: Aviation Departure"
+            unit_pos: right
+            unit: "KM/H"
+
+  - title: Custom Styles & Sizes
+    path: custom
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: "## Custom Styles"
+
+          - type: custom:flip-sensor-card
+            demo_mode: true
+            title: "Custom Colors (Matrix Style)"
+            theme: classic
+            custom_style:
+              --flip-bg: "#000000"
+              --flip-text: "#00ff00"
+              --flip-border: "1px solid #003300"
+              --flip-shadow: "0 0 5px #00ff00"
+            
+          - type: custom:flip-sensor-card
+            demo_mode: true
+            title: "Transparent Background"
+            theme: classic
+            custom_style:
+              --flip-bg: "rgba(0,0,0,0.5)"
+              --flip-text: "#ffffff"
+              background: "url('https://demo.home-assistant.io/assets/living_room.jpg')"
+              background-size: "cover"
+
+          - type: markdown
+            content: "## Sizes & Layouts"
+
+          - type: custom:flip-sensor-card
+            demo_mode: true
+            title: "Large Size (80px)"
+            size: 80
+            theme: classic
+            
+          - type: custom:flip-sensor-card
+            demo_mode: true
+            title: "Small Size (30px)"
+            size: 30
+            theme: classic
+
+          - type: custom:flip-sensor-card
+            demo_mode: true
+            title: "Many Digits (8)"
+            digit_count: 8
+            theme: ios-dark
+
+  - title: Unit Positioning
+    path: units
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: "## Unit Positions"
+
+          - type: custom:flip-sensor-card
+            demo_mode: true
+            title: "Unit: None (Inside Drum)"
+            unit_pos: none
+            unit: "°C"
+            theme: classic
+
+          - type: custom:flip-sensor-card
+            demo_mode: true
+            title: "Unit: Top"
+            unit_pos: top
+            unit: "WATTS"
+            theme: classic
+
+          - type: custom:flip-sensor-card
+            demo_mode: true
+            title: "Unit: Bottom"
+            unit_pos: bottom
+            unit: "KILOWATTS"
+            theme: classic
+

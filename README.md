@@ -1,429 +1,117 @@
 # Flip Sensor Card
 
-This is a custom card for Home Assistant that shows an entity value as a mechanical drum / counter.  
-Each character sits on its own “wheel” and spins to the new value, like an old-school counter or split-flap display.
+A fully customizable Lovelace card for Home Assistant that displays entity values as mechanical split-flap / drum counters.
 
-The card is read-only. It does not control the entity in any way.
+![License](https://img.shields.io/github/license/dzaczek/lovelace-flip-sensor-card)
+![Version](https://img.shields.io/github/v/release/dzaczek/lovelace-flip-sensor-card)
+
+This card is read-only and does not control the entity in any way.
+
+## Features
+
+- **Mechanical Animation**: Realistic flip animation for numbers and characters.
+- **Multiple Themes**: Built-in themes including Classic, iOS, Neon, Wood, and Aviation.
+- **Visual Editor**: Fully supported in Lovelace UI visual editor.
+- **Highly Customizable**: Adjust sizes, gaps, speeds, colors, and more.
+- **Attribute Support**: Display state or specific attributes of an entity.
+- **Demo Mode**: Test the look and feel without connecting to a real entity.
 
 ---
 
+## Showcase & Examples
+
+Check out [`examples.yaml`](examples.yaml) for a complete dashboard configuration demonstrating all themes and options.
 
 https://github.com/user-attachments/assets/0a1d7521-89bc-42fb-8cc4-a45b2cebc417
-
-
-## How it works
-
-- It reads the state of the given entity (for example `sensor.temperature_living_room`), or a specific attribute if `attribute` is specified.
-- It splits the value string into individual characters.
-- Each character is rendered as a separate drum.
-- When the value changes, each drum spins through its character set until it reaches the new one.
-- Some characters use the flip animation, others are updated instantly.
-- If the entity is unavailable or not found, an error message is displayed.
-
-Characters that support animated spinning:
-
-`space, 0–9, '.', ',', ':', '%', '°'`
-
-If some other character appears (for example a letter), it will still be shown, but without the spin animation.
 
 ---
 
 ## Installation
 
-### Via HACS
+### Via HACS (Recommended)
 
 1. Go to **HACS → Frontend**.
-2. Add this repo as a **Custom repository** (type: Lovelace).
-3. Install the card.
-4. Reload the Home Assistant frontend (refresh the browser).
+2. Click menu (three dots) → **Custom repositories**.
+3. Add this repo URL with category **Lovelace**.
+4. Click **Install**.
+5. Reload your dashboard.
 
-### Manual install
+### Manual Install
 
-1. Copy `flip-sensor-card.js` into:
-
-   `/config/www/`
-
-2. Add the resource in Lovelace (Settings → Dashboards → Resources) or in `configuration.yaml`:
-
-   ```yaml
-   url: /local/flip-sensor-card.js
-   type: module
-   ```
-
-3. Save and hard-refresh the browser (Ctrl+F5 / Cmd+Shift+R).
+1. Copy `flip-sensor-card.js` to `/config/www/`.
+2. Add resource in Lovelace (Settings → Dashboards → Resources):
+   - URL: `/local/flip-sensor-card.js`
+   - Type: `JavaScript Module`
+3. Refresh browser.
 
 ---
 
-## Basic configuration
+## Configuration
 
-The smallest useful example:
+You can configure the card using the **Visual Editor** in Lovelace or via **YAML**.
 
-```yaml
-type: custom:flip-sensor-card
-entity: sensor.temperature_living_room
-title: Living room
-```
-
-The card will show the entity state as a row of drums, using the default theme.
-
----
-
-## Available options
-
-Below is a list of all options you can use in the card config.
-
-
-# ⚙️ Configuration Options
-
-Here is a complete list of all available options for the `flip-sensor-card`.
+### Options
 
 | Name | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| **`entity`** | `string` | **Required** | The entity ID to display (e.g., `sensor.temperature`). Required unless `demo_mode` is true. |
-| **`attribute`** | `string` | `null` | (Optional) Specific attribute to display instead of the main state (e.g., `current_temperature`, `hour`). |
-| `title` | `string` | `null` | A title displayed at the top of the card. |
-| `theme` | `string` | `classic` | Visual preset. Options: `classic`, `ios-light`, `ios-dark`, `neon`, `wood`, `red`, `aviation-departure`. |
+| **`entity`** | `string` | **Required** | The entity ID to display. Required unless `demo_mode` is true. |
+| **`attribute`** | `string` | `null` | (Optional) Specific attribute to display instead of state. |
+| `title` | `string` | `null` | Optional title displayed above the card. |
+| `theme` | `string` | `classic` | Visual preset: `classic`, `ios-light`, `ios-dark`, `neon`, `wood`, `red`, `aviation-departure`. |
 | `size` | `number` | `50` | Height of the flip tiles in pixels. |
-| `digit_count` | `number` | `4` | Target number of digits. The card adds empty padding tiles if the number is shorter. |
+| `digit_count` | `number` | `4` | Minimum number of digits to show. Adds empty padding tiles if value is shorter. |
 | `gap` | `number` | `5` | Spacing (gap) between individual tiles in pixels. |
-| `unit_pos` | `string` | `none` | Position of the unit label. Options: `top`, `bottom`, `none` (inside the drum). |
-| `unit` | `string` | `null` | Manually override the unit text. If not set, it pulls `unit_of_measurement` from the entity. |
-| `speed` | `number` | `0.6` | Duration (in seconds) for a single step flip (e.g., 1 -> 2). |
-| `spin_speed` | `number` | `0.12` | Duration (in seconds) for fast spinning steps (e.g., 5 -> 4 loop). |
-| `remove_speed`| `number`| `0.5` | Duration (in seconds) of the fade-out/collapse animation when removing empty tiles. |
-| `demo_mode` | `boolean`| `false` | If `true`, ignores the entity and runs a test animation loop. |
-| `custom_style`| `object` | `null` | A map of CSS variables to override styles (see below). |
+| `unit_pos` | `string` | `none` | Position of unit label: `none` (inside), `top`, `bottom`. |
+| `unit` | `string` | `null` | Manually override unit text. Defaults to entity's `unit_of_measurement`. |
+| `speed` | `number` | `0.6` | Flip animation duration (seconds). |
+| `spin_speed` | `number` | `0.12` | Fast spin animation duration (seconds). |
+| `remove_speed` | `number` | `0.5` | Duration of removing excess tiles animation (seconds). |
+| `demo_mode` | `boolean` | `false` | Run a demo loop without reading any entity. |
+| `custom_style` | `object` | `null` | Custom CSS variable overrides. |
+
+### Visual Editor
+
+The card fully supports the Lovelace visual editor. When adding a card, search for **Flip Sensor Card**. You can configure all options directly in the UI.
 
 ---
 
-### 🎨 CSS Variables (custom_style)
+## Themes
 
-You can override specific visual elements using the `custom_style` option in YAML.
+| Theme | Description |
+| :--- | :--- |
+| **Classic** | Dark background, light text. Retro counter style. |
+| **iOS Light** | Light background, dark text, soft shadows. Clean modern look. |
+| **iOS Dark** | Dark background, white text. Matches dark mode dashboards. |
+| **Neon** | Black background, bright green glowing text. Cyberpunk vibe. |
+| **Wood** | Brown background, warm text. Vintage wooden panel look. |
+| **Red** | Dark background, red digits. Alarm / HUD style. |
+| **Aviation** | Classic airport departure board style. Yellow text on black, Oswald font. |
 
-| Variable Name | Description | Example |
-| :--- | :--- | :--- |
-| `--flip-bg` | Background color of the tiles | `#222`, `rgba(0,0,0,0.8)` |
-| `--flip-text` | Color of the numbers | `#ff0000`, `white` |
-| `--flip-font` | Font family used for digits | `'Courier New'`, `sans-serif` |
-| `--flip-border-radius`| Rounding of the tile corners | `4px`, `50%` |
-| `--flip-shadow` | CSS box-shadow for the tiles | `0 4px 10px rgba(0,0,0,0.5)` |
-| `--flip-border` | CSS border definition | `1px solid red` |
-| `--flip-text-shadow` | CSS text-shadow (useful for neon effects) | `0 0 5px green` |
+---
 
+## Advanced Configuration
 
-#### Example Usage
+### Custom Styling (`custom_style`)
 
-
-https://github.com/user-attachments/assets/0f3b64ae-e013-4201-a333-4959848b4bc3
-
+You can override CSS variables to customize the look beyond built-in themes.
 
 ```yaml
 type: custom:flip-sensor-card
-entity: sensor.power_usage
-digit_count: 5
-unit_pos: bottom
-theme: classic
+entity: sensor.power
 custom_style:
-  --flip-bg: "#000000"
+  --flip-bg: "#222"
   --flip-text: "#00ff00"
   --flip-border-radius: "0px"
+  --flip-shadow: "none"
 ```
----
 
-### `entity` (string)
+### Supported Characters
 
-- The entity whose state will be displayed.
-- Example: `sensor.temperature_living_room`
-- **Required**, unless you are using `demo_mode: true`.
-
-```yaml
-entity: sensor.temperature_living_room
-```
+The flip animation works for: `0-9`, `space`, `.`, `,`, `:`, `%`, `°`.
+Other characters (letters, symbols) are displayed statically without animation.
 
 ---
 
-### `demo_mode` (bool)
+## License
 
-- If `true`, the card does not read any entity.
-- Instead, it cycles through a few demo values in a loop.
-- Handy for testing layout and styles.
-
-```yaml
-demo_mode: true
-```
-
-You should not set `entity` and `demo_mode: true` together. Pick one.
-
----
-
-### `size` (number)
-
-- Height of a single drum (one tile), in pixels.
-- Default: `50`
-- Larger value → bigger drums and text.
-
-```yaml
-size: 80
-```
-
----
-
-### `gap` (number)
-
-- Space between drums, in pixels.
-- Default: `5`
-
-```yaml
-gap: 8
-```
-
----
-
-### `digit_count` (number)
-
-- Minimum number of drums to show.
-- Default: `4`
-- If the value has fewer characters than `digit_count`, empty drums are added on the left.
-- If the value has more characters, extra drums are added on the left as needed.
-
-```yaml
-digit_count: 6
-```
-
----
-
-### `attribute` (string)
-
-- Optional attribute name to display instead of the main entity state.
-- Useful for displaying specific attributes like `current_temperature`, `hour`, `minute`, etc.
-- If the attribute doesn't exist, an error message will be displayed.
-
-```yaml
-entity: sensor.weather
-attribute: current_temperature
-```
-
----
-
-### `unit_pos` (string)
-
-- Position where the unit label is displayed.
-- Options:
-  - `none` (default): Unit is appended to the value as part of the flip display
-  - `top`: Unit is displayed above the flip display
-  - `bottom`: Unit is displayed below the flip display
-
-```yaml
-unit_pos: top
-```
-
----
-
-### `unit` (string)
-
-- Manually override the unit text.
-- If not set, the card automatically uses `unit_of_measurement` from the entity attributes.
-- Useful when you want to display a different unit than what the entity provides.
-
-```yaml
-unit: "°F"
-```
-
----
-
-### `title` (string)
-
-- Optional label shown above the drums.
-
-```yaml
-title: Living room temperature
-```
-
----
-
-### `speed` (number)
-
-- Duration of one flip animation when the drum only needs to move by one step.
-- In seconds.
-- Default: `0.6`
-
-Used for small changes like `2 → 3`.
-
-```yaml
-speed: 0.5
-```
-
----
-
-### `spin_speed` (number)
-
-- Duration of one step when the drum has to spin through more than one character.
-- In seconds.
-- Default: `0.12`
-
-For example, going from `1` to `8` will spin through several characters using this speed.
-
-```yaml
-spin_speed: 0.1
-```
-
----
-
-### `remove_speed` (number)
-
-- Duration of the “removing” animation for extra left-side drums that are no longer needed.
-- In seconds.
-- Default: `0.5`
-
-How it behaves:
-
-- When the entity value gets shorter, the leftmost drums may end up showing only spaces.
-- The card keeps track of how many times this happens in a row.
-- After a few cycles, it animates those extra drums out (they shrink and fade), then removes them from the DOM.
-
-```yaml
-remove_speed: 0.4
-```
-
----
-
-### `theme` (string)
-
-Selects a built-in theme (colors, fonts, shadows).
-
-Available themes:
-
-- `classic`  
-  Dark background, light text. Slightly retro.
-
-- `ios-light`  
-  Light background, dark text, soft shadow. Inspired by iOS cards.
-
-- `ios-dark`  
-  Dark background, light text, stronger shadow. Good for dark dashboards.
-
-- `neon`  
-  Black background, bright green text, subtle neon glow.
-
-- `wood`  
-  Brown background, warm text. Looks like an old wooden panel.
-
-- `red`  
-  Dark background with red digits. Feels like an alarm / HUD display.
-
-- `aviation-departure`  
-  Classic airport departure board style with yellow text on black background. Uses Oswald font for authentic look.
-
-Example:
-
-```yaml
-theme: neon
-```
-
-If you pass an unknown theme name, the card falls back to `classic`.
-
----
-
-### `custom_style` (object)
-
-Extra CSS overrides.  
-Whatever you put here is merged into the base theme and injected into `:host { ... }`.
-
-You can use it to tweak:
-
-- colors,
-- fonts,
-- shadows,
-- and custom CSS variables used inside the card.
-
-Example – small tweaks:
-
-```yaml
-custom_style:
-  --card-size: 70px
-  background: "transparent"
-```
-
-Example – override colors on top of a built-in theme:
-
-```yaml
-theme: classic
-custom_style:
-  --flip-bg: "#101010"
-  --flip-text: "#ffcc00"
-  --flip-text-shadow: "0 0 8px rgba(255, 204, 0, 0.8)"
-```
-
----
-
-## Example configurations
-
-### 1. Simple temperature sensor
-
-```yaml
-type: custom:flip-sensor-card
-entity: sensor.temperature_living_room
-title: Living room
-unit_pos: none
-theme: classic
-```
-
----
-
-### 2. Neon style with faster spinning
-
-```yaml
-type: custom:flip-sensor-card
-entity: sensor.power_usage
-title: Power usage
-unit_pos: bottom
-theme: neon
-size: 70
-speed: 0.5
-spin_speed: 0.08
-remove_speed: 0.4
-```
-
----
-
-### 3. iOS dark style, more digits
-
-```yaml
-type: custom:flip-sensor-card
-entity: sensor.energy_today
-title: Energy today
-unit_pos: top
-theme: ios-dark
-size: 80
-digit_count: 6
-```
-
----
-
-### 4. Using attribute option
-
-```yaml
-type: custom:flip-sensor-card
-entity: sensor.weather
-attribute: current_temperature
-title: Current Temperature
-unit_pos: bottom
-theme: classic
-```
-
----
-
-### 5. Demo mode (no entity required)
-
-```yaml
-type: custom:flip-sensor-card
-demo_mode: true
-title: Demo
-theme: wood
-size: 60
-```
-
----
-
-That’s it.  
-Pick an entity, choose a theme, adjust speeds and sizes to your taste, and you get a smooth, animated drum display that looks like something pulled out of an old counter, but wired into Home Assistant.
+MIT License. See [LICENSE](LICENSE) for details.
