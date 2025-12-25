@@ -61,6 +61,18 @@ jobs:
           fi
           echo "✓ All required files present"
       
+      - name: Check for Pre-release
+        id: check_prerelease
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          if [[ "$TAG_NAME" == *"beta"* ]] || [[ "$TAG_NAME" == *"alpha"* ]] || [[ "$TAG_NAME" == *"rc"* ]]; then
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+            echo "Marking as Pre-release"
+          else
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+            echo "Marking as Release"
+          fi
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
@@ -90,6 +102,6 @@ jobs:
             README.md
             CHANGELOG.md
           draft: false
-          prerelease: false
+          prerelease: ${{ steps.check_prerelease.outputs.is_prerelease }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
