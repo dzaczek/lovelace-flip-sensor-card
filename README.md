@@ -59,7 +59,7 @@ You can configure the card using the **Visual Editor** in Lovelace or via **YAML
 | `title` | `string` | `null` | Optional title displayed above the card. |
 | `theme` | `string` | `classic` | Visual preset: `classic`, `ios-light`, `ios-dark`, `neon`, `wood`, `red`, `aviation-departure`. |
 | `size` | `number` | `50` | Height of the flip tiles in pixels. |
-| `digit_count` | `number` | `4` | Minimum number of digits to show. Adds empty padding tiles if value is shorter. |
+| `digit_count` | `number` | `4` | For numeric values: number of decimal places to display (e.g., 2 rounds 9.39999 to 9.40). For non-numeric values: minimum number of tiles to show. |
 | `gap` | `number` | `5` | Spacing (gap) between individual tiles in pixels. |
 | `unit_pos` | `string` | `none` | Position of unit label: `none` (inside), `top`, `bottom`. |
 | `unit` | `string` | `null` | Manually override unit text. Defaults to entity's `unit_of_measurement`. |

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- **`digit_count` behavior for numeric values** - Now controls decimal precision instead of minimum tiles
+  - Numeric sensors: `digit_count: 2` rounds `9.39999` to `9.40`
+  - Integer sensors: `digit_count: 2` displays `42` as `42.00`
+  - Non-numeric values: Preserves existing minimum tile behavior
+  - To avoid decimals on integer sensors, set `digit_count: 0`
+
 ## [25.0.2] - 2025-12-24
 
 ### Added
