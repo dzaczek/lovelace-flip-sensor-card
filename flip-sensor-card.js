@@ -74,7 +74,7 @@ class FlipSensorCard extends HTMLElement {
     // Validate and set size parameters
     this.cardSize = config.size || 50;
     this.gap = config.gap || 5;
-    this.digitCount = config.digit_count || 4;
+    this.digitCount = config.digit_count !== undefined ? config.digit_count : 4;
     
     if (this.cardSize <= 0) {
       throw new Error('Size must be greater than 0');
