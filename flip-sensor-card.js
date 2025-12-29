@@ -74,7 +74,7 @@ class FlipSensorCard extends HTMLElement {
     // Validate and set size parameters
     this.cardSize = config.size || 50;
     this.gap = config.gap || 5;
-    this.digitCount = config.digit_count || 4;
+    this.digitCount = config.digit_count !== undefined ? config.digit_count : 4;
     
     if (this.cardSize <= 0) {
       throw new Error('Size must be greater than 0');
@@ -128,7 +128,10 @@ class FlipSensorCard extends HTMLElement {
     } else {
       value = String(stateObj.state);
     }
-    
+
+    // Format numeric values based on digit_count for decimal precision
+    value = this.formatNumericValue(value, this.digitCount);
+
     // Get unit from config or entity attributes
     let unit = this.manualUnit !== null ? this.manualUnit : (stateObj.attributes.unit_of_measurement || '');
 
@@ -398,6 +401,31 @@ class FlipSensorCard extends HTMLElement {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  /**
+   * Formats numeric values to specified decimal precision
+   * @param {string|number} value - Raw value from sensor
+   * @param {number} decimalPlaces - Number of decimal places
+   * @returns {string} Formatted value or original if not numeric
+   */
+  formatNumericValue(value, decimalPlaces) {
+    const valueStr = String(value).trim();
+
+    // Preserve non-numeric states
+    if (valueStr === '' || valueStr === 'unavailable' || valueStr === 'unknown') {
+      return valueStr;
+    }
+
+    const numValue = Number(valueStr);
+
+    // Return original if not a valid number
+    if (isNaN(numValue) || !isFinite(numValue)) {
+      return valueStr;
+    }
+
+    // Round to decimal places using toFixed()
+    return numValue.toFixed(decimalPlaces);
   }
 
   /**
